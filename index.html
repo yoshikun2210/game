@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<head>
+
+    <title></title>
+
+    <style>
+
+        body {
+
+            background: gainsboro;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+        }
+
+        canvas {
+
+            border: 5px solid black;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<canvas width="400" height="400" id="myCanvas"></canvas>
+
+<script>
+
+
+    let canvas = document.getElementById('myCanvas');
+
+    let context = canvas.getContext('2d');
+
+
+
+    let grid = 16;
+
+    let snake = {
+
+        x: 160,
+
+        y: 160,
+
+        dx: grid,
+
+        dy: 0,
+
+        cells: [],
+
+        maxCells: 3
+
+    };
+
+    let count = 0;
+
+    let apple = {
+
+        x: 320,
+
+        y: 320,
+
+    };
+
+    //số nguyên ngẫu nhiên
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+
+    }
+
+
+
+    function loop() {
+
+        requestAnimationFrame(loop);
+
+
+        if (++count < 3) {
+
+            return;
+
+        }
+
+
+        count = 0;
+
+        context.clearRect(0,0,canvas.width,canvas.height);//xóa vị trí cũ
+
+
+        snake.x += snake.dx; // mỗi loop rắn sẽ di chuyển thêm 1dx đơn vị
+
+        snake.y += snake.dy;
+
+
+        // khi snake đụng tường sẽ chạy lại từ hướng đối diện
+
+        if (snake.x < 0) {
+
+            snake.x = canvas.width - grid;
+
+        }
+
+        else if (snake.x >= canvas.width) {
+
+            snake.x = 0;
+
+
+        }
+
+
+        if (snake.y < 0) {
+
+            snake.y = canvas.height - grid;
+
+        }
+
+        else if (snake.y >= canvas.height) {
+
+            snake.y = 0;
+
+        }
+
+
+        // Phương thức unshift sẽ thêm một hoặc nhiều phần tử vào đầu mảng
+
+        snake.cells.unshift({x: snake.x, y: snake.y});
+
+
+        // thêm 1 ô vuông phía trc thì phải remove 1 cái phía sau để snake move dc.
+
+        if (snake.cells.length > snake.maxCells) {
+
+            snake.cells.pop();
+
+        }
+
+
+        // draw apple
+
+        context.fillStyle = 'yellow';
+
+        context.fillRect(apple.x, apple.y, grid-1, grid-1);
+
+
+        // draw snake
+
+        context.fillStyle = 'red';
+
+        snake.cells.forEach(function(cell, index) {
+
+            context.fillRect(cell.x, cell.y, grid-1, grid-1);
+
+
+            // snake ăn apple
+
+            if (cell.x === apple.x && cell.y === apple.y) {
+
+                snake.maxCells++;
+
+
+                apple.x = getRandomInt(0, 25) * grid;
+
+                apple.y = getRandomInt(0, 25) * grid;
+
+            }
+
+
+            // check va chạm khi rắn đụng đuôi
+
+            for (let i = index + 1; i < snake.cells.length; i++) {
+
+
+
+                // va chạm thì reset game
+
+                if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+
+                    snake.x = 160;
+
+                    snake.y = 160;
+
+                    snake.cells = [];
+
+                    snake.maxCells = 4;
+
+                    snake.dx = grid;
+
+                    snake.dy = 0;
+
+
+                    apple.x = getRandomInt(0, 25) * grid;
+
+                    apple.y = getRandomInt(0, 25) * grid;
+
+                }
+
+            }
+
+        });
+
+    }
+
+    //bắt sự kiện bàn phím
+
+    document.addEventListener('keydown', function(e) {
+
+        // lọc sự kiện keydown để rắn không di ngược lại
+
+        if (e.which === 37 && snake.dx === 0) {
+
+            snake.dx = -grid;
+
+            snake.dy = 0;
+
+        }
+
+        else if (e.which === 38 && snake.dy === 0) {
+
+            snake.dy = -grid;
+
+            snake.dx = 0;
+
+        }
+
+        else if (e.which === 39 && snake.dx === 0) {
+
+            snake.dx = grid;
+
+            snake.dy = 0;
+
+        }
+
+        else if (e.which === 40 && snake.dy === 0) {
+
+            snake.dy = grid;
+
+            snake.dx = 0;
+
+        }
+
+    });
+
+
+    requestAnimationFrame(loop);
+
+</script>
+
+</body>
+
+
+</body>
+</html>
